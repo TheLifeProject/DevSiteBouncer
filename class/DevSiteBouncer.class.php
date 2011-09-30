@@ -32,19 +32,23 @@ class DevSiteBouncer extends Object {
 			$http = 'http://';
 		else
 			$http = 'https://';
-			
-		// Bounce if we're not already looking at the live host.
-		if($this->settings['livehost'] != ($http . $_SERVER['HTTP_HOST']))
+		
+		// Don't bounce if the livehost is empty.
+		if($this->settings['livehost'] != '')
 		{
-			// Don't bounce if the uri contains wp- (allows for wordpress login/out)
-			if(!preg_match('#/wp\-#i', $_SERVER['REQUEST_URI']))
+			// Bounce if we're not already looking at the live host.
+			if($this->settings['livehost'] != ($http . $_SERVER['HTTP_HOST']))
 			{
-				// Only bounce to the live site if the current user can't edit posts.
-				if(!current_user_can('edit_posts'))
+				// Don't bounce if the uri contains wp- (allows for wordpress login/out)
+				if(!preg_match('#/wp\-#i', $_SERVER['REQUEST_URI']))
 				{
-					header('Location: ' . $this->settings['livehost'] . $_SERVER['REQUEST_URI']);
-					//echo('Location: ' . $this->settings['livehost'] . $_SERVER['REQUEST_URI']);
-					die();
+					// Only bounce to the live site if the current user can't edit posts.
+					if(!current_user_can('edit_posts'))
+					{
+						header('Location: ' . $this->settings['livehost'] . $_SERVER['REQUEST_URI']);
+						//echo('Location: ' . $this->settings['livehost'] . $_SERVER['REQUEST_URI']);
+						die();
+					}
 				}
 			}
 		}
@@ -87,19 +91,27 @@ class DevSiteBouncer extends Object {
 				
 				if(isset($_POST) && isset($_POST['livehost']))
 				{
-					$livehost = $_POST['livehost'];
+					$livehost = strtolower($_POST['livehost']);
 					if($livehost == "")
 					{
-						$errors = "You have not entered anything in the livehost field.  Your preference
-						will be saved and will result in the plugin functionality being deactivated.
+						$errors = "You have not entered anything in the livehost field.";
+						$messages = "Your preference HAS BEEN SAVED and will result in the plugin functionality being deactivated.
 						Unauthorized visitors will no longer be redirected away from this site.";
+						$this->settings['livehost'] = '';
+						update_option('DevSiteBouncer_Settings', $this->settings);
 					}
 					else 
 					{
-						$messages = "Your selection has been saved.  Unauthorized visitors will now be
-						redirected to " . $livehost;
+						if(!preg_match('#\://#i', $livehost))
+						{
+							$livehost = 'http://' . $livehost;
+						}
+						
 						$this->settings['livehost'] = $livehost;
 						update_option('DevSiteBouncer_Settings', $this->settings);
+						
+						$messages = "Your selection has been saved.  Unauthorized visitors will now be
+						redirected to " . $livehost;
 					}
 				}
 				
@@ -138,42 +150,11 @@ class DevSiteBouncer extends Object {
 	 * Install Scripts
 	 */
 	function install()
-	{
-		// Attempt to determine a live host name.
-		$liveHost = $_SERVER['HTTP_HOST'];
-		$hostParts = explode('.', $liveHost);
-		if(count($hostParts) > 2)
-		{
-			/*
-			 * Find the lowest subdomain value and replace with www.
-			 * So the following cases should work.
-			 * dev.domain.com -> www.domain.com
-			 * dev.something.else.domain.com -> www.something.else.domain.com
-			 * www.domain.com -> www.domain.com
-			 */
-			$hostParts[0] = 'www';
-			$liveHost = implode('.', $hostParts);
-		}
-		else
-		{
-			/*
-			 * If we only have two levels of domain or less, assume that we're already looking at
-			 * thelive site.  No changes need to be made.
-			 * domain.com -> domain.com
-			 * localhost -> localhost
-			 */
-		}
-		
-		// We will use secure on non-secure depending on where we are.
-		if (!isset($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] != "on")
-			$http = 'http://';
-		else
-			$http = 'https://';
-		
+	{	
 		// Create the settings array.
 		$settings = array(
 			'version' => $this->version,
-			'livehost' => $http . $liveHost,
+			'livehost' => '',
 		);
 		add_option('DevSiteBouncer_Settings', $settings);
 		$this->settings = $settings;

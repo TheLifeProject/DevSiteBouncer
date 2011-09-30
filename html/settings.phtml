@@ -7,15 +7,15 @@
 		will be redirected to ${basepath}/some/page/ unless they log into the WordPress admin interface
 		and have contributor or higher access. 
 		</p></td></tr>
-		<?php if($messages) { ?>
-		<tr style='color: #000099;'>
-			<td valign="top" align="left" colspan='2'><strong><?php echo $messages; ?></strong></td>
-		</tr>
-		<?php } ?>
 		<?php if($errors) { ?>
 		<tr style='color: #FF0000;'>
 			<td valign="top" align="right"><strong>Errors:</strong></td>
 			<td valign="top" align="left"><?php echo $errors; ?></td>
+		</tr>
+		<?php } ?>
+		<?php if($messages) { ?>
+		<tr style='color: #000099;'>
+			<td valign="top" align="left" colspan='2'><strong><?php echo $messages; ?></strong></td>
 		</tr>
 		<?php } ?>
 		<tr>
