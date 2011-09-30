@@ -1,1 +1,32 @@
-This is a test.
+<h2>Development Site Bouncer Settings</h2>
+<form name='DevSiteBouncerForm' action='' method="post">
+	<table width=500>
+		<tr><td colspan="2"><p>
+		Enter the base level path below where you want non-developers to be redirected to.  This
+		path will be used as the base path for any redirections.  Someone going to dev.yourdomain.com/some/page/
+		will be redirected to ${basepath}/some/page/ unless they log into the WordPress admin interface
+		and have contributor or higher access. 
+		</p></td></tr>
+		<?php if($messages) { ?>
+		<tr style='color: #000099;'>
+			<td valign="top" align="left" colspan='2'><strong><?php echo $messages; ?></strong></td>
+		</tr>
+		<?php } ?>
+		<?php if($errors) { ?>
+		<tr style='color: #FF0000;'>
+			<td valign="top" align="right"><strong>Errors:</strong></td>
+			<td valign="top" align="left"><?php echo $errors; ?></td>
+		</tr>
+		<?php } ?>
+		<tr>
+			<td valign="top" align="right"><strong>Live Hostname:</strong></td>
+			<td valign="top" align="left"><input type='text' name='livehost' value="<?php echo $this->settings['livehost']; ?>" /><br/>
+			<small>This is where non-developers will be redirected to.</small>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="right">&nbsp;</td>
+			<td valign="top" align="left"><input type="submit" name='Save' value='Save' /></td>
+		</tr>
+	</table>
+</form>

@@ -36,7 +36,8 @@ class DevSiteBouncer extends Object {
 		// Bounce if we're not already looking at the live host.
 		if($this->settings['livehost'] != ($http . $_SERVER['HTTP_HOST']))
 		{
-			if(!preg_match('#wp\-#i', $_SERVER['REQUEST_URI']))
+			// Don't bounce if the uri contains wp- (allows for wordpress login/out)
+			if(!preg_match('#/wp\-#i', $_SERVER['REQUEST_URI']))
 			{
 				// Only bounce to the live site if the current user can't edit posts.
 				if(!current_user_can('edit_posts'))
@@ -47,31 +48,6 @@ class DevSiteBouncer extends Object {
 				}
 			}
 		}
-	}
-	
-	/**
-	 * Tie into the admin section to show admin related navigation.
-	 */
-	function wp_admin_init()
-	{
-		$this->plugin_page = basename(__FILE__);
-		add_management_page(
-			__('Development Site'), 
-			__('Development Site'), 
-			'edit_posts', 
-			$this->plugin_page, 
-			array(&$this, 'wp_admin_options')
-		);
-		add_action( 'admin_head', array($this, 'wp_admin_css') );
-	}
-	
-	/**
-	 * Link To Admin CSS
-	 */
-	function wp_admin_css()
-	{
-		if(isset($_GET['page']) AND $_GET['page'] == $this->plugin_page)
-			echo ( '<link rel="stylesheet" type="text/css" href="'. $this->url . 'css/styles.css" />' );
 	}
 	
 	/**
@@ -99,16 +75,63 @@ class DevSiteBouncer extends Object {
 		}
 		else 
 			$action = $q['action'];
+			
+		$messages = "";
+		$errors = "";
 		
 		// Load a set of stats to display depending on the units selected.
 		switch($action)
 		{
 			case 'settings':
 			default:
+				
+				if(isset($_POST) && isset($_POST['livehost']))
+				{
+					$livehost = $_POST['livehost'];
+					if($livehost == "")
+					{
+						$errors = "You have not entered anything in the livehost field.  Your preference
+						will be saved and will result in the plugin functionality being deactivated.
+						Unauthorized visitors will no longer be redirected away from this site.";
+					}
+					else 
+					{
+						$messages = "Your selection has been saved.  Unauthorized visitors will now be
+						redirected to " . $livehost;
+						$this->settings['livehost'] = $livehost;
+						update_option('DevSiteBouncer_Settings', $this->settings);
+					}
+				}
+				
 				include($this->path . "/html/settings.phtml");
 				break;
 		}
 		
+	}
+	
+	/**
+	 * Tie into the admin section to show admin related navigation.
+	 */
+	function wp_admin_init()
+	{
+		$this->plugin_page = basename(__FILE__);
+		add_management_page(
+			__('Development Site'), 
+			__('Development Site'), 
+			'edit_posts', 
+			$this->plugin_page, 
+			array(&$this, 'wp_admin_options')
+		);
+		add_action( 'admin_head', array($this, 'wp_admin_css') );
+	}
+	
+	/**
+	 * Link To Admin CSS
+	 */
+	function wp_admin_css()
+	{
+		if(isset($_GET['page']) AND $_GET['page'] == $this->plugin_page)
+			echo ( '<link rel="stylesheet" type="text/css" href="'. $this->url . 'css/styles.css" />' );
 	}
 	
 	/**
