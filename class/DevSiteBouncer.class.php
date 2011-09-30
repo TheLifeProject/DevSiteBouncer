@@ -94,9 +94,7 @@ class DevSiteBouncer extends Object {
 					$livehost = strtolower($_POST['livehost']);
 					if($livehost == "")
 					{
-						$errors = "You have not entered anything in the livehost field.";
-						$messages = "Your preference HAS BEEN SAVED and will result in the plugin functionality being deactivated.
-						Unauthorized visitors will no longer be redirected away from this site.";
+						$errors .= "You have not entered anything in the livehost field. Unauthorized visitors will no longer be redirected away from this site.";
 						$this->settings['livehost'] = '';
 						update_option('DevSiteBouncer_Settings', $this->settings);
 					}
@@ -113,6 +111,12 @@ class DevSiteBouncer extends Object {
 						$messages = "Your selection has been saved.  Unauthorized visitors will now be
 						redirected to " . $livehost;
 					}
+				}
+				
+				if($this->settings['livehost'] == '')
+				{
+					$messages .= "\nYou have not put anything in the Live Hostname field.  This will prevent the plugin
+					from functioning properly and unauthorized visitors will NOT be redirected away from your development site.";
 				}
 				
 				include($this->path . "/html/settings.phtml");
