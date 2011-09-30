@@ -15,7 +15,7 @@ Useful for creating and managing development environments where regular visitors
 the site, but the developer would like the ability to see theme or plugin changes before going live with them.
 Also prevents development sites from being seen and spidered by search engines.
 
-Created by the [TruthMedia Internet Group](http://truthmedia.com)
+Created by [TruthMedia](http://truthmedia.com)
 Programming and Design by [James Warkentin](http://www.warkensoft.com/about-me/)
 
 = Features: =
@@ -70,8 +70,3 @@ BETA SOFTWARE and as such may function in unexpected ways.  Of course, we
 do try our best to make sure it is as stable as possible and try to address
 problems as quickly as possible when they come up, but just be aware that
 there may still be bugs.
-
-In the event that you DO experience any problems with this software, we would
-like to hear about it and will do our best to fix the problem.  You can let us
-know about bugs by commenting on [our blog](http://truthmedia.com/category/historical-comment-count/ "TruthMedia Plugin Blog")
-
