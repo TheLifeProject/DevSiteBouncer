@@ -2,7 +2,7 @@
 Contributors: truthmedia
 Donate link: http://truthmedia.com/engage/giving/
 Tags: development, developer, private, protect, redirect
-Requires at least: 2.3.2
+Requires at least: 2.8
 Tested up to: 3.2.1
 Stable tag: trunk
 
@@ -23,17 +23,12 @@ Programming and Design by [James Warkentin](http://www.warkensoft.com/about-me/)
 * Prevent unwanted visitors from coming to development sites.
 * Prevent search engines from spidering and listing development sites.
 
-= More Information: =
-
-For more information about this plugin, visit the plugin homepage at:
-[http://www.truthmedia.com/wordpress/historical-comment-count/](http://www.truthmedia.com/wordpress/historical-comment-count/)
-
 == Installation ==
 
 = Plugin Requirements: =
 
-* WordPress 2.3.2 or higher
-* PHP 4.3 or higher
+* WordPress 2.8 or higher
+* PHP 4 or higher
 
 = Instructions: =
 
@@ -42,9 +37,13 @@ For more information about this plugin, visit the plugin homepage at:
 
 2. Upload the Plugin Files
 - Unzip and upload to your WordPress plugins folder, located in your WordPress install under /wp-content/plugins/
+- If you regularly sync your live DB to a testing DB, you will want to install and activate the plugin on your live server.  That way db syncs will keep track of the saved settings on live, and will always redirect users back to the live.
 
 3. Activate the Plugin
 - Browse in the WordPress admin interface to the plugin activation page and activate the plugin.
+
+4. Configure Live Hostname
+- The plugin will add a new WordPress menu item under Tools called Development Site.  Go there and configure the Live Hostname. 
 
 == Changelog ==
 
