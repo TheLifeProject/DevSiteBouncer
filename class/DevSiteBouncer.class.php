@@ -2,9 +2,11 @@
 
 class DevSiteBouncer extends Object {
 	
+	var $version = '';
 	var $path = '';
 	var $url = '';
 	var $prefix = 'wp_';
+	var $settings = false;
 	
 	/**
 	 * Main Bounce Handling Code
@@ -14,7 +16,37 @@ class DevSiteBouncer extends Object {
 	 */
 	function init()
 	{
+		// Load the plugin settings.
+		$settings = get_option('DevSiteBouncer_Settings');
+		if($settings === false)
+		{
+			$this->install();
+		}
+		else
+		{
+			$this->settings = $settings;
+		}
 		
+		// We will use secure on non-secure depending on where we are.
+		if (!isset($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] != "on")
+			$http = 'http://';
+		else
+			$http = 'https://';
+			
+		// Bounce if we're not already looking at the live host.
+		if($this->settings['livehost'] != ($http . $_SERVER['HTTP_HOST']))
+		{
+			if(!preg_match('#wp\-#i', $_SERVER['REQUEST_URI']))
+			{
+				// Only bounce to the live site if the current user can't edit posts.
+				if(!current_user_can('edit_posts'))
+				{
+					header('Location: ' . $this->settings['livehost'] . $_SERVER['REQUEST_URI']);
+					//echo('Location: ' . $this->settings['livehost'] . $_SERVER['REQUEST_URI']);
+					die();
+				}
+			}
+		}
 	}
 	
 	/**
@@ -26,7 +58,7 @@ class DevSiteBouncer extends Object {
 		add_management_page(
 			__('Development Site'), 
 			__('Development Site'), 
-			'edit_pages', 
+			'edit_posts', 
 			$this->plugin_page, 
 			array(&$this, 'wp_admin_options')
 		);
@@ -77,6 +109,51 @@ class DevSiteBouncer extends Object {
 				break;
 		}
 		
+	}
+	
+	/**
+	 * Install Scripts
+	 */
+	function install()
+	{
+		// Attempt to determine a live host name.
+		$liveHost = $_SERVER['HTTP_HOST'];
+		$hostParts = explode('.', $liveHost);
+		if(count($hostParts) > 2)
+		{
+			/*
+			 * Find the lowest subdomain value and replace with www.
+			 * So the following cases should work.
+			 * dev.domain.com -> www.domain.com
+			 * dev.something.else.domain.com -> www.something.else.domain.com
+			 * www.domain.com -> www.domain.com
+			 */
+			$hostParts[0] = 'www';
+			$liveHost = implode('.', $hostParts);
+		}
+		else
+		{
+			/*
+			 * If we only have two levels of domain or less, assume that we're already looking at
+			 * thelive site.  No changes need to be made.
+			 * domain.com -> domain.com
+			 * localhost -> localhost
+			 */
+		}
+		
+		// We will use secure on non-secure depending on where we are.
+		if (!isset($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] != "on")
+			$http = 'http://';
+		else
+			$http = 'https://';
+		
+		// Create the settings array.
+		$settings = array(
+			'version' => $this->version,
+			'livehost' => $http . $liveHost,
+		);
+		add_option('DevSiteBouncer_Settings', $settings);
+		$this->settings = $settings;
 	}
 	
 	/**

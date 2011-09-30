@@ -12,6 +12,8 @@ Allows developers to run secondary copies of WordPress sites that redirect non-d
 
 
 */
+	
+	$DevSiteBouncerVersion = '1.00';
 
 	/**
 	 * Test and see if we have loaded the class objects.  Include the files if we haven't.
@@ -27,6 +29,7 @@ Allows developers to run secondary copies of WordPress sites that redirect non-d
 	if(!isset($wp_devSiteBouncer)) {
 		global $table_prefix;
 		$wp_devSiteBouncer = new DevSiteBouncer();
+		$wp_devSiteBouncer->version = $DevSiteBouncerVersion;
 		
 		$wp_devSiteBouncer->path = dirname(__FILE__);
 		$wp_devSiteBouncer->prefix = $table_prefix;
